@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buon Compleanno Mamma!</title>
+    <!-- Font eleganti e icone -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 2000px; /* Necessario per l'effetto di profondità 3D */
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        /* Contenitore principale della Card con effetto 3D */
+        .card-container {
+            width: 100%;
+            max-width: 800px;
+            min-height: 430px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Classe applicata via JS per girare il biglietto */
+        .card-container.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* Proprietà comuni per le due facce */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; /* Nasconde il retro durante la rotazione */
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* ==========================================
+           FAZZA 1: BIGLIETTO DI AUGURI (Fronte)
+           ========================================== */
+        .card-front {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            flex-direction: column;
+            align-items: center;
+            padding: 35px 25px;
+            text-align: center;
+            background-image: radial-gradient(#fed7aa 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 2;
+        }
+
+        .card-front h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: #ec4899;
+            margin-bottom: 35px;
+	    margin-top: 25px;
+        }
+
+        .card-front h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+	    margin: 25px 0;
+        }
+
+        .card-front p {
+            font-size: 1rem;
+            color: #64748b;
+            max-width: 600px;
+            line-height: 1.6;
+            margin: 25px 0;
+        }
+
+        .hint-text {
+            font-weight: 600;
+            color: #0284c7 !important;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        .btn-flip {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+
+        .btn-flip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.6);
+        }
+
+        /* ==========================================
+           FACCIA 2: BIGLIETTO AEREO FAKE (Retro)
+           ========================================== */
+        .card-back {
+            background: #ffffff;
+            transform: rotateY(180deg); /* Ruotato di base sul retro */
+            flex-direction: row;
+        }
+
+        /* Stile barra superiore azzurra ispirata a 'biglietto aereo fake.jpg' */
+        .ticket-header-band {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 100%);
+            z-index: 1;
+        }
+
+        /* Corpo principale del biglietto sinistro */
+        .ticket-main {
+            flex: 2.3;
+            padding: 75px 30px 30px 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Linea tratteggiata di strappo del biglietto */
+        .ticket-divider {
+            width: 2px;
+            position: relative;
+            background-image: linear-gradient(#cbd5e1 50%, rgba(255,255,255,0) 0%);
+            background-position: right;
+            background-size: 2px 15px;
+            background-repeat: repeat-y;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            margin: 50px 0 20px 0;
+        }
+        
+        /* Incavi circolari stile biglietto */
+        .ticket-divider::before, .ticket-divider::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #c3cfe2; /* Sfondo dinamico pagina */
+            border-radius: 50%;
+            left: -12px;
+            z-index: 5;
+        }
+        .ticket-divider::before { top: -62px; }
+        .ticket-divider::after { bottom: -32px; }
+
+        /* Parte destra del biglietto (Stub / Ricevuta) */
+        .ticket-stub {
+            flex: 1;
+            padding: 75px 25px 30px 25px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Griglia informazioni passeggero */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 0.9rem;
+            color: #1e293b;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Grafica Tratta Milano -> Parigi */
+        .route-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .city-code {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .city-name {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .flight-path {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin: 0 20px;
+        }
+
+        .flight-line {
+            width: 100%;
+            height: 2px;
+            background-color: #cbd5e1;
+            position: relative;
+        }
+
+        .airplane-icon {
+            font-size: 1.6rem;
+            color: #0ea5e9;
+            position: absolute;
+            background: white;
+            padding: 0 8px;
+        }
+
+        /* Footer del biglietto con Barcode */
+        .ticket-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+        }
+
+        .fake-barcode {
+            width: 180px;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000,
+                #000 2px,
+                #fff 2px,
+                #fff 4px,
+                #000 4px,
+                #000 7px,
+                #fff 7px,
+                #fff 8px
+            );
+            opacity: 0.85;
+        }
+
+        /* Stub dettagli (lato destro) */
+        .stub-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .stub-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        
+        .btn-back {
+            position: absolute;
+            bottom: 10px;
+            left: 30px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .btn-back:hover {
+            color: #64748b;
+            text-decoration: underline;
+        }
+
+        /* ==========================================
+           RESPONSIVITÀ PER SMARTPHONE (MOBILE)
+           ========================================== */
+        @media (max-width: 680px) {
+            body {
+                align-items: flex-start;
+                padding-top: 30px;
+            }
+
+            .card-container {
+                min-height: 680px; 
+            }
+
+            .card-front h1 {
+                font-size: 2.4rem;
+            }
+
+            .card-front h2 {
+                font-size: 1.2rem;
+            }
+
+
+            .card-back {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .ticket-main {
+                flex: none;
+                padding: 65px 20px 20px 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 colonne su mobile */
+                gap: 12px;
+            }
+
+            .city-code {
+                font-size: 2.2rem;
+            }
+
+            .ticket-divider {
+                width: 100%;
+                height: 2px;
+                background-image: linear-gradient(90deg, #cbd5e1 50%, rgba(255,255,255,0) 0%);
+                background-size: 15px 2px;
+                background-repeat: repeat-x;
+                margin: 10px 0;
+            }
+
+            /* Modifica dei fori laterali per la versione verticale */
+            .ticket-divider::before, .ticket-divider::after {
+                left: auto;
+                top: -12px;
+            }
+            .ticket-divider::before { left: -12px; }
+            .ticket-divider::after { right: -12px; }
+
+            .ticket-stub {
+                flex: none;
+                padding: 20px;
+                background: #fafafa;
+            }
+
+            .ticket-footer {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .fake-barcode {
+                width: 100%;
+                max-width: 220px;
+            }
+
+            .btn-back {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                margin-top: 15px;
+                text-align: center;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenitore 3D Card -->
+    <div class="card-container" id="ticketCard">
+        
+        <!-- FACCIA 1: BIGLIETTO DI AUGURI (FRONTE) -->
+        <div class="card-face card-front">
+            <div>
+                <h1>Buon Compleanno Mamma!</h1>
+                <h2>60 e un regalo che vale un ricordo</h2>
+            </div>
+            
+            <p>Per questo traguardo davvero importante abbiamo pensato a qualcosa di speciale per una persona 		speciale. Un’esperienza meravigliosa da vivere insieme alla tua famiglia!</p>
+            
+            <p class="hint-text">✨ Preparati, fai le valigie e chiudi i bagagli! ✨</p>
+            
+            <button class="btn-flip" onclick="flipCard()">Scopri il tuo regalo</button>
+        </div>
+
+        <!-- FACCIA 2: BIGLIETTO AEREO FAKE (RETRO) -->
+        <div class="card-face card-back">
+            <div class="ticket-header-band"></div>
+            
+            <!-- Corpo Principale Biglietto -->
+            <div class="ticket-main">
+                <!-- Sezione Dati Volo -->
+                <div class="info-grid">
+                    <div class="info-block">
+                        <span class="info-label">Passenger</span>
+                        <span class="info-value">MAMMA SPECIALE</span>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Flight</span>
+                        <span class="info-value">FR 6060</span>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Date</span>
+                        <span class="info-value">10 LUG 2026</span>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Seat</span>
+                        <span class="info-value">1A</span>
+                    </div>
+                </div>
+
+                <!-- Grafica Tratta con Aeroplanino -->
+                <div class="route-container">
+                    <div>
+                        <div class="city-code">MIL</div>
+                        <div class="city-name">Milano (MXP)</div>
+                    </div>
+                    <div class="flight-path">
+                        <div class="flight-line"></div>
+                        <div class="airplane-icon">✈</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="city-code">ORY</div>
+                        <div class="city-name">Parigi (Orly)</div>
+                    </div>
+                </div>
+
+                <!-- Footer del biglietto -->
+                <div class="ticket-footer">
+                    <div class="fake-barcode"></div>
+                    <div style="display: flex; gap: 20px; justify-content: space-between; width: 100%; max-width: 180px;">
+                        <div class="info-block">
+                            <span class="info-label">Gate</span>
+                            <span class="info-value">A25</span>
+                        </div>
+                        <div class="info-block" style="text-align: right;">
+                            <span class="info-label">Boarding Time</span>
+                            <span class="info-value">09:55</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-back" onclick="flipCard()">⬅ Torna agli auguri</button>
+            </div>
+
+            <!-- Divisore con microfori (Gestito in CSS per girarsi su Mobile) -->
+            <div class="ticket-divider"></div>
+
+            <!-- Stub/Ricevuta Destra -->
+            <div class="ticket-stub">
+                <div>
+                    <div class="stub-title">Boarding Pass INFO</div>
+                    <div class="stub-info-row">
+                        <span class="info-label">Passenger:</span>
+                        <span class="info-value" style="font-size: 0.75rem;">MAMMA</span>
+                    </div>
+                    <div class="stub-info-row">
+                        <span class="info-label">Route:</span>
+                        <span class="info-value" style="font-size: 0.75rem;">MIL ➔ ORY</span>
+                    </div>
+                    <div class="stub-info-row">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value" style="font-size: 0.75rem;">10 LUG 2026</span>
+                    </div>
+                    <div class="stub-info-row">
+                        <span class="info-label">Seat:</span>
+                        <span class="info-value" style="font-size: 0.75rem;">1A</span>
+                    </div>
+                    <div class="stub-info-row">
+                        <span class="info-label">Boarding:</span>
+                        <span class="info-value" style="font-size: 0.75rem;">09:55</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script JavaScript per gestire il flip -->
+    <script>
+        function flipCard() {
+            const card = document.getElementById('ticketCard');
+            card.classList.toggle('flipped');
+        }
+    </script>
+</body>
+</html>
